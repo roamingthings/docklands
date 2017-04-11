@@ -1,0 +1,34 @@
+version: "3"
+
+services:
+  fakesmtp:
+    build: https://github.com/Nilhcem/FakeSMTP.git
+    networks:
+      - backend
+    volumes:
+      - /data/fakesmtp/mail:/output
+    privileged: true
+  
+  keycloak:
+    image: jboss/keycloak
+    ports:
+      - 8080:8080
+    environment:
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=secret
+    networks:
+      - backend
+    depends_on:
+      - fakesmtp
+    volumes:
+      - keycloak-themes:/opt/jboss/keycloak/themes
+
+networks:
+  backend:
+
+volumes:
+  keycloak-themes:
+     driver_opts:
+       type: none
+       device: /data/keycloak/themes
+       o: bind
